@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  firebaseAuthID String   @unique @db.VarChar(60)
+
+  firstName      String @db.VarChar(40)
+  lastName       String @db.VarChar(40)
+  phone          String @unique @db.VarChar(20)
+  documentNumber String @unique @db.VarChar(12)
+  email          String @unique @db.VarChar(60)
+
+  userStatistics   UserStatistics @relation(fields: [userStatisticsId], references: [id])
+  userStatisticsId Int
+  Order            Order[]
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  totalInCents Int
+
+  user             User               @relation(fields: [userId], references: [id])
+  userId           Int
+  orderStatus      OrderStatus        @relation(fields: [orderStatusId], references: [id])
+  orderStatusId    Int
+  paymentStatus    PaymentStatus      @relation(fields: [paymentStatusId], references: [id])
+  paymentStatusId  Int
+  paymentMethod    PaymentMethod      @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId  Int
+  ProductsOnOrders ProductsOnOrders[]
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name               String             @db.VarChar(120)
+  description        String             @db.VarChar(120)
+  priceInCents       Int
+  finalPriceInCents  Int
+  discountPercentage Int
+  quantity           Int
+  Image              Image[]
+  ProductsOnOrders   ProductsOnOrders[]
+}
+
+model ProductsOnOrders {
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   Int
+
+  @@id([productId, orderId])
+}
+
+model UserStatistics {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  totalSpentInCents       Int
+  lastOrderCompletedDate  DateTime
+  numberOfCompletedOrders Int
+  User                    User[]
+}
+
+model PaymentStatus {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String  @db.VarChar(40)
+  Order Order[]
+}
+
+model OrderStatus {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String  @db.VarChar(40)
+  Order Order[]
+}
+
+model PaymentMethod {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String  @db.VarChar(40)
+  Order Order[]
+}
+
+model Image {
+  id  Int    @id @default(autoincrement())
+  url String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+}

@@ -1,4 +1,4 @@
-export default class UserStatistics {
+export default class AccountStatistics {
   id: string;
   totalSpentInCents: number;
   lastOrderCompletedDate: Date;

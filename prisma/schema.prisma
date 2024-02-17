@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Account {
   id             Int      @id @default(autoincrement())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -22,9 +22,8 @@ model User {
   documentNumber String @unique @db.VarChar(12)
   email          String @unique @db.VarChar(60)
 
-  userStatistics   UserStatistics @relation(fields: [userStatisticsId], references: [id])
-  userStatisticsId Int
-  Order            Order[]
+  orders            Order[]
+  accountStatistics AccountStatistics?
 }
 
 model Order {
@@ -34,15 +33,15 @@ model Order {
 
   totalInCents Int
 
-  user             User               @relation(fields: [userId], references: [id])
-  userId           Int
+  account          Account            @relation(fields: [accountId], references: [id])
+  accountId        Int
   orderStatus      OrderStatus        @relation(fields: [orderStatusId], references: [id])
   orderStatusId    Int
   paymentStatus    PaymentStatus      @relation(fields: [paymentStatusId], references: [id])
   paymentStatusId  Int
   paymentMethod    PaymentMethod      @relation(fields: [paymentMethodId], references: [id])
   paymentMethodId  Int
-  ProductsOnOrders ProductsOnOrders[]
+  productsOnOrders ProductsOnOrders[]
 }
 
 model Product {
@@ -56,8 +55,8 @@ model Product {
   finalPriceInCents  Int
   discountPercentage Int
   quantity           Int
-  Image              Image[]
-  ProductsOnOrders   ProductsOnOrders[]
+  images             Image[]
+  productsOnOrders   ProductsOnOrders[]
 }
 
 model ProductsOnOrders {
@@ -69,15 +68,16 @@ model ProductsOnOrders {
   @@id([productId, orderId])
 }
 
-model UserStatistics {
+model AccountStatistics {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   totalSpentInCents       Int
-  lastOrderCompletedDate  DateTime
+  lastOrderCompletedDate  DateTime?
   numberOfCompletedOrders Int
-  User                    User[]
+  account                 Account   @relation(fields: [accountId], references: [id])
+  accountId               Int       @unique
 }
 
 model PaymentStatus {

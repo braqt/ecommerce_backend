@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "Account" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -9,9 +9,8 @@ CREATE TABLE "User" (
     "phone" VARCHAR(20) NOT NULL,
     "documentNumber" VARCHAR(12) NOT NULL,
     "email" VARCHAR(60) NOT NULL,
-    "userStatisticsId" INTEGER NOT NULL,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -20,7 +19,7 @@ CREATE TABLE "Order" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "totalInCents" INTEGER NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "accountId" INTEGER NOT NULL,
     "orderStatusId" INTEGER NOT NULL,
     "paymentStatusId" INTEGER NOT NULL,
     "paymentMethodId" INTEGER NOT NULL,
@@ -52,15 +51,16 @@ CREATE TABLE "ProductsOnOrders" (
 );
 
 -- CreateTable
-CREATE TABLE "UserStatistics" (
+CREATE TABLE "AccountStatistics" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "totalSpentInCents" INTEGER NOT NULL,
-    "lastOrderCompletedDate" TIMESTAMP(3) NOT NULL,
+    "lastOrderCompletedDate" TIMESTAMP(3),
     "numberOfCompletedOrders" INTEGER NOT NULL,
+    "accountId" INTEGER NOT NULL,
 
-    CONSTRAINT "UserStatistics_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "AccountStatistics_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -103,22 +103,22 @@ CREATE TABLE "Image" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_firebaseAuthID_key" ON "User"("firebaseAuthID");
+CREATE UNIQUE INDEX "Account_firebaseAuthID_key" ON "Account"("firebaseAuthID");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+CREATE UNIQUE INDEX "Account_phone_key" ON "Account"("phone");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_documentNumber_key" ON "User"("documentNumber");
+CREATE UNIQUE INDEX "Account_documentNumber_key" ON "Account"("documentNumber");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "Account_email_key" ON "Account"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AccountStatistics_accountId_key" ON "AccountStatistics"("accountId");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_userStatisticsId_fkey" FOREIGN KEY ("userStatisticsId") REFERENCES "UserStatistics"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_orderStatusId_fkey" FOREIGN KEY ("orderStatusId") REFERENCES "OrderStatus"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -134,6 +134,9 @@ ALTER TABLE "ProductsOnOrders" ADD CONSTRAINT "ProductsOnOrders_productId_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "ProductsOnOrders" ADD CONSTRAINT "ProductsOnOrders_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AccountStatistics" ADD CONSTRAINT "AccountStatistics_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Image" ADD CONSTRAINT "Image_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

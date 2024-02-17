@@ -1,6 +1,6 @@
-import UserStatistics from './userStatistics.model';
+import AccountStatistics from './accountStatistics.model';
 
-export default class User {
+export default class Account {
   id: number;
   firebaseAuthID: string;
   firstName: string;
@@ -8,5 +8,5 @@ export default class User {
   phone: string;
   documentNumber: string;
   email: string;
-  userStatistics: UserStatistics;
+  accountStatistics?: AccountStatistics;
 }

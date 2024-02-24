@@ -31,7 +31,7 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  totalInCents Int
+  totalInCents BigInt
 
   account          Account            @relation(fields: [accountId], references: [id])
   accountId        Int
@@ -51,8 +51,8 @@ model Product {
 
   name               String             @db.VarChar(120)
   description        String             @db.VarChar(120)
-  priceInCents       Int
-  finalPriceInCents  Int
+  priceInCents       BigInt
+  finalPriceInCents  BigInt
   discountPercentage Int
   quantity           Int
   images             Image[]
@@ -60,6 +60,8 @@ model Product {
 }
 
 model ProductsOnOrders {
+  quantity Int
+
   product   Product @relation(fields: [productId], references: [id])
   productId Int
   order     Order   @relation(fields: [orderId], references: [id])
@@ -73,7 +75,7 @@ model AccountStatistics {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  totalSpentInCents       Int
+  totalSpentInCents       BigInt
   lastOrderCompletedDate  DateTime?
   numberOfCompletedOrders Int
   account                 Account   @relation(fields: [accountId], references: [id])
@@ -83,27 +85,24 @@ model AccountStatistics {
 model PaymentStatus {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  name  String  @db.VarChar(40)
+  name  String  @unique @db.VarChar(40)
   Order Order[]
 }
 
 model OrderStatus {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  name  String  @db.VarChar(40)
+  name  String  @unique @db.VarChar(40)
   Order Order[]
 }
 
 model PaymentMethod {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  name  String  @db.VarChar(40)
+  name  String  @unique @db.VarChar(40)
   Order Order[]
 }
 

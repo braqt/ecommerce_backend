@@ -18,7 +18,7 @@ CREATE TABLE "Order" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "totalInCents" INTEGER NOT NULL,
+    "totalInCents" BIGINT NOT NULL,
     "accountId" INTEGER NOT NULL,
     "orderStatusId" INTEGER NOT NULL,
     "paymentStatusId" INTEGER NOT NULL,
@@ -34,8 +34,8 @@ CREATE TABLE "Product" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" VARCHAR(120) NOT NULL,
     "description" VARCHAR(120) NOT NULL,
-    "priceInCents" INTEGER NOT NULL,
-    "finalPriceInCents" INTEGER NOT NULL,
+    "priceInCents" BIGINT NOT NULL,
+    "finalPriceInCents" BIGINT NOT NULL,
     "discountPercentage" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL,
 
@@ -44,6 +44,7 @@ CREATE TABLE "Product" (
 
 -- CreateTable
 CREATE TABLE "ProductsOnOrders" (
+    "quantity" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
     "orderId" INTEGER NOT NULL,
 
@@ -55,7 +56,7 @@ CREATE TABLE "AccountStatistics" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "totalSpentInCents" INTEGER NOT NULL,
+    "totalSpentInCents" BIGINT NOT NULL,
     "lastOrderCompletedDate" TIMESTAMP(3),
     "numberOfCompletedOrders" INTEGER NOT NULL,
     "accountId" INTEGER NOT NULL,
@@ -67,7 +68,6 @@ CREATE TABLE "AccountStatistics" (
 CREATE TABLE "PaymentStatus" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" VARCHAR(40) NOT NULL,
 
     CONSTRAINT "PaymentStatus_pkey" PRIMARY KEY ("id")
@@ -77,7 +77,6 @@ CREATE TABLE "PaymentStatus" (
 CREATE TABLE "OrderStatus" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" VARCHAR(40) NOT NULL,
 
     CONSTRAINT "OrderStatus_pkey" PRIMARY KEY ("id")
@@ -87,7 +86,6 @@ CREATE TABLE "OrderStatus" (
 CREATE TABLE "PaymentMethod" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" VARCHAR(40) NOT NULL,
 
     CONSTRAINT "PaymentMethod_pkey" PRIMARY KEY ("id")
@@ -116,6 +114,15 @@ CREATE UNIQUE INDEX "Account_email_key" ON "Account"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AccountStatistics_accountId_key" ON "AccountStatistics"("accountId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PaymentStatus_name_key" ON "PaymentStatus"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OrderStatus_name_key" ON "OrderStatus"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PaymentMethod_name_key" ON "PaymentMethod"("name");
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

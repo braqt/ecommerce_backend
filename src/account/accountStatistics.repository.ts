@@ -10,7 +10,7 @@ export default class AccountStatisticsRepository {
       data: {
         lastOrderCompletedDate: null,
         numberOfCompletedOrders: 0,
-        totalSpentInCents: 0,
+        totalSpentInCents: 0n,
         accountId,
       },
     });

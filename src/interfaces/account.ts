@@ -8,7 +8,7 @@ export interface Account {
 }
 
 export interface AccountStatistics {
-  totalSpentInCents: number;
+  totalSpentInCents: bigint;
   lastOrderCompletedDate: Date | null;
   numberOfCompletedOrders: number;
 }

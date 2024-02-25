@@ -1,20 +1,24 @@
 export interface Product {
   name: string;
   description: string;
-  priceInCents: number;
-  finalPriceInCents: number;
+  priceInCents: bigint;
+  finalPriceInCents: bigint;
   discountPercentage: number;
   quantity: number;
   images: { url: string }[];
+}
+
+export interface ProductWithId extends Product {
+  id: number;
 }
 
 export interface CreateProductParams {
   name: string;
   description: string;
   quantity: number;
-  priceInCents: number;
+  priceInCents: bigint;
   discountPercentage: number;
-  finalPriceInCents: number;
+  finalPriceInCents: bigint;
   imagesUrl: string[];
 }
 
@@ -25,6 +29,6 @@ export interface GetProductsParams {
 }
 
 export interface GetProductsResult {
-  products: Product[];
+  products: ProductWithId[];
   count: number;
 }

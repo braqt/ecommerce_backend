@@ -47,6 +47,7 @@ export default class ProductRepository {
   }: GetProductsParams): Promise<GetProductsResult> {
     const query: Prisma.ProductFindManyArgs = {
       select: {
+        id: true,
         name: true,
         description: true,
         priceInCents: true,

@@ -35,9 +35,10 @@ export default class ProductController {
     const createProductDto = plainToClass(CreateProductDto, body);
     const imagesBuffer = files.map((file) => file.buffer);
     const imagesUrl = await this.imageService.uploadImages(imagesBuffer);
-    const priceInCents = createProductDto.price * 1000;
+    const priceInCents = BigInt(createProductDto.price) * 1000n;
     const finalPriceInCents =
-      priceInCents - (priceInCents * createProductDto.discountPercentage) / 100;
+      priceInCents -
+      (priceInCents * BigInt(createProductDto.discountPercentage)) / 100n;
     await this.productRepository.createProduct({
       name: createProductDto.name,
       description: createProductDto.description,

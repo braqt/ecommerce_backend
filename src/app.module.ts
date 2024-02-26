@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProductModule } from './product/product.module';
 import { ImageModule } from './image/image.module';
 import { HttpModule } from '@nestjs/axios';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
     ProductModule,
     ImageModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

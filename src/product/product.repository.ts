@@ -8,6 +8,7 @@ import {
 } from './product.interfaces';
 import { Prisma } from '@prisma/client';
 import { GetProductDto } from './dto/getProducts.dto';
+import { CartProduct } from '../order/dto/createOrder.dto';
 
 @Injectable()
 export default class ProductRepository {
@@ -94,5 +95,18 @@ export default class ProductRepository {
     });
 
     return product;
+  }
+
+  async subtractManyProductQuantity(products: CartProduct[]): Promise<void> {
+    let updateProductPromises = [];
+    for (const product of products) {
+      updateProductPromises.push(
+        this.prismaService.product.update({
+          data: { quantity: { decrement: product.quantity } },
+          where: { id: product.id },
+        }),
+      );
+    }
+    await this.prismaService.$transaction(updateProductPromises);
   }
 }

@@ -38,6 +38,32 @@ export default class AccountRepository {
     return account;
   }
 
+  async getAccountByFirebaseAuthID(
+    firebaseAuthID: string,
+  ): Promise<AccountWithId> {
+    const query = {
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        documentNumber: true,
+        phone: true,
+        firebaseAuthID: true,
+        accountStatistics: {
+          select: {
+            totalSpentInCents: true,
+            numberOfCompletedOrders: true,
+            lastOrderCompletedDate: true,
+          },
+        },
+      },
+      where: { firebaseAuthID },
+    };
+    const account = await this.prismaService.account.findUnique(query);
+    return account;
+  }
+
   async getAllAccounts(
     getAccountsDto: GetAccountsDto,
   ): Promise<GetAllAccountsResult> {

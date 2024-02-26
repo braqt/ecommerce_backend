@@ -6,8 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "prisma:insert:defaultRecords":"prisma db execute --file ./prisma/insertStatusesValues.sql --schema ./prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev",
-    "build": "nest build",
+    "build": "npm run prisma:insert:defaultRecords && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

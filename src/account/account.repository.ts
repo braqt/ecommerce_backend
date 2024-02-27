@@ -4,7 +4,7 @@ import AccountDto from './dto/account.dto';
 import {
   AccountWithAccountStatistics,
   AccountWithId,
-} from '../interfaces/account';
+} from './account.interfaces';
 import { GetAccountDto, GetAccountsDto } from './dto/getAccounts.dto';
 import { Prisma } from '@prisma/client';
 import { GetAllAccountsResult } from './account.interfaces';

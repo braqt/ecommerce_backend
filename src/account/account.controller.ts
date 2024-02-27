@@ -13,8 +13,8 @@ export default class AccountController {
 
   @Post('create')
   async createAccount(@Body() accountDto: AccountDto) {
-    const user = await this.accountRepository.createAccount(accountDto);
-    await this.accountStatistics.createAccountStatistics(user.id);
+    const account = await this.accountRepository.createAccount(accountDto);
+    await this.accountStatistics.createAccountStatistics(account.id);
   }
 
   @Get('getAllAccounts')

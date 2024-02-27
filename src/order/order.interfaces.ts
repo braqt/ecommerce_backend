@@ -65,7 +65,26 @@ export interface OrderWithNoAccountStatisticsNoProducts {
   };
 }
 
+export interface OrderWithNoAccountNoProducts {
+  id: number;
+  totalInCents: bigint;
+  orderStatus: {
+    name: string;
+  };
+  paymentStatus: {
+    name: string;
+  };
+  paymentMethod: {
+    name: string;
+  };
+}
+
 export interface GetOrdersResult {
   orders: OrderWithNoAccountStatisticsNoProducts[];
+  count: number;
+}
+
+export interface GetAccountOrdersResult {
+  orders: OrderWithNoAccountNoProducts[];
   count: number;
 }

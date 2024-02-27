@@ -9,8 +9,17 @@ import {
 } from './order.utils';
 import { OrderStatus, PaymentStatus } from './order.enums';
 import AccountRepository from '../account/account.repository';
-import { GetOrderDto, GetOrdersDto } from './dto/getOrders.dto';
-import { GetOrdersResult, Order } from './order.interfaces';
+import {
+  GetAccountOrdersDto,
+  GetOrderDto,
+  GetOrdersDto,
+} from './dto/getOrders.dto';
+import {
+  GetAccountOrdersResult,
+  GetOrdersResult,
+  Order,
+} from './order.interfaces';
+import { SetOrderStatusDto, SetPaymentStatusDto } from './dto/updateOrder.dto';
 
 @Injectable()
 export default class OrderService {
@@ -70,6 +79,36 @@ export default class OrderService {
       pageSize,
       clientName,
       orderNumber,
+    });
+  }
+
+  async setOrderStatus({
+    orderNumber,
+    orderStatus,
+  }: SetOrderStatusDto): Promise<void> {
+    const orderStatusId = orderStatusToID(orderStatus);
+    await this.orderRepository.setOrderStatus(orderNumber, orderStatusId);
+  }
+
+  async setPaymentStatus({
+    orderNumber,
+    paymentStatus,
+  }: SetPaymentStatusDto): Promise<void> {
+    await this.orderRepository.setPaymentStatus(
+      orderNumber,
+      paymentStatusToID(paymentStatus),
+    );
+  }
+
+  async getAccountOrders({
+    id,
+    pageNumber,
+    pageSize,
+  }: GetAccountOrdersDto): Promise<GetAccountOrdersResult> {
+    return await this.orderRepository.getAccountOrders({
+      accountId: id,
+      pageNumber,
+      pageSize,
     });
   }
 }

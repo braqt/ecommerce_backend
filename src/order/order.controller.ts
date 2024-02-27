@@ -9,7 +9,12 @@ import {
 import { Request } from 'express';
 import OrderService from './order.service';
 import { CreateOrderDto } from './dto/createOrder.dto';
-import { GetOrderDto, GetOrdersDto } from './dto/getOrders.dto';
+import {
+  GetAccountOrdersDto,
+  GetOrderDto,
+  GetOrdersDto,
+} from './dto/getOrders.dto';
+import { SetOrderStatusDto, SetPaymentStatusDto } from './dto/updateOrder.dto';
 
 @Controller('orders')
 export default class OrderController {
@@ -38,12 +43,48 @@ export default class OrderController {
   }
 
   @Get('getOrders')
-  async getOrders(@Body() getOrderDto: GetOrdersDto, @Req() req: Request) {
+  async getOrders(@Body() getOrdersDto: GetOrdersDto, @Req() req: Request) {
     if (!req.headers.authorization) {
       throw new BadRequestException('authorization header it is not defined');
     }
-    const { orders, count } = await this.orderService.getOrders(getOrderDto);
-    const pageNumberLimit = Math.ceil(count / getOrderDto.pageSize);
+    const { orders, count } = await this.orderService.getOrders(getOrdersDto);
+    const pageNumberLimit = Math.ceil(count / getOrdersDto.pageSize);
+    return { orders, pageNumberLimit };
+  }
+
+  @Post('setOrderStatus')
+  async setOrderStatus(
+    @Body() setOrderStatusDto: SetOrderStatusDto,
+    @Req() req: Request,
+  ) {
+    if (!req.headers.authorization) {
+      throw new BadRequestException('authorization header it is not defined');
+    }
+    await this.orderService.setOrderStatus(setOrderStatusDto);
+  }
+
+  @Post('setPaymentStatus')
+  async setPaymentStatus(
+    @Body() setPaymentStatusDto: SetPaymentStatusDto,
+    @Req() req: Request,
+  ) {
+    if (!req.headers.authorization) {
+      throw new BadRequestException('authorization header it is not defined');
+    }
+    await this.orderService.setPaymentStatus(setPaymentStatusDto);
+  }
+
+  @Get('getAccountOrders')
+  async getAccountOrders(
+    @Body() getAccountOrdersDto: GetAccountOrdersDto,
+    @Req() req: Request,
+  ) {
+    if (!req.headers.authorization) {
+      throw new BadRequestException('authorization header it is not defined');
+    }
+    const { orders, count } =
+      await this.orderService.getAccountOrders(getAccountOrdersDto);
+    const pageNumberLimit = Math.ceil(count / getAccountOrdersDto.pageSize);
     return { orders, pageNumberLimit };
   }
 }

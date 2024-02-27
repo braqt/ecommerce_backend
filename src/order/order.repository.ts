@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateOrderParams, GetOrdersResult } from './order.interfaces';
+import {
+  CreateOrderParams,
+  GetAccountOrdersResult,
+  GetOrdersResult,
+} from './order.interfaces';
 
 @Injectable()
 export default class OrderRepository {
@@ -159,5 +163,69 @@ export default class OrderRepository {
       },
       where: { id },
     });
+  }
+
+  async setOrderStatus(orderId: number, orderStatusId: number): Promise<void> {
+    await this.prismaService.order.update({
+      data: { orderStatusId },
+      where: { id: orderId },
+    });
+  }
+
+  async setPaymentStatus(
+    orderId: number,
+    paymentStatusId: number,
+  ): Promise<void> {
+    await this.prismaService.order.update({
+      data: { paymentStatusId },
+      where: { id: orderId },
+    });
+  }
+
+  async getAccountOrders({
+    pageNumber,
+    pageSize,
+    accountId,
+  }: {
+    pageNumber: number;
+    pageSize: number;
+    accountId: number;
+  }): Promise<GetAccountOrdersResult> {
+    const query: Prisma.OrderFindManyArgs = {
+      select: {
+        id: true,
+        totalInCents: true,
+      },
+      where: { accountId },
+      orderBy: { createdAt: 'desc' },
+      skip: pageSize * (pageNumber - 1),
+      take: pageSize,
+    };
+    const [orders, count] = await this.prismaService.$transaction([
+      this.prismaService.order.findMany({
+        ...query,
+        select: {
+          ...query.select,
+          paymentMethod: {
+            select: {
+              name: true,
+            },
+          },
+          orderStatus: {
+            select: {
+              name: true,
+            },
+          },
+          paymentStatus: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.order.count({ where: query.where }),
+    ]);
+
+    return { orders, count };
   }
 }

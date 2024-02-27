@@ -13,6 +13,20 @@ export interface CreateOrderParams {
 export interface Order {
   id: number;
   totalInCents: bigint;
+  orderStatus: {
+    name: string;
+  };
+  paymentStatus: {
+    name: string;
+  };
+  paymentMethod: {
+    name: string;
+  };
+}
+
+export interface OrderWithAccountWithProducts extends Order {
+  id: number;
+  totalInCents: bigint;
   account: {
     id: number;
     firstName: string;
@@ -44,7 +58,7 @@ export interface Order {
   }[];
 }
 
-export interface OrderWithNoAccountStatisticsNoProducts {
+export interface OrderWithAccountNoStatistics extends Order {
   id: number;
   totalInCents: bigint;
   account: {
@@ -65,26 +79,12 @@ export interface OrderWithNoAccountStatisticsNoProducts {
   };
 }
 
-export interface OrderWithNoAccountNoProducts {
-  id: number;
-  totalInCents: bigint;
-  orderStatus: {
-    name: string;
-  };
-  paymentStatus: {
-    name: string;
-  };
-  paymentMethod: {
-    name: string;
-  };
-}
-
 export interface GetOrdersResult {
-  orders: OrderWithNoAccountStatisticsNoProducts[];
+  orders: OrderWithAccountNoStatistics[];
   count: number;
 }
 
 export interface GetAccountOrdersResult {
-  orders: OrderWithNoAccountNoProducts[];
+  orders: Order[];
   count: number;
 }

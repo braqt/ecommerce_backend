@@ -1,9 +1,7 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty } from 'class-validator';
+import { Role } from '../../auth/auth.enum';
 
 export default class AccountDto {
-  @IsNotEmpty()
-  firebaseAuthID: string;
-
   @IsNotEmpty()
   firstName: string;
 
@@ -15,6 +13,10 @@ export default class AccountDto {
 
   @IsNotEmpty()
   documentNumber: string;
+
+  @IsNotEmpty()
+  @IsEnum(Role)
+  role: Role;
 
   @IsNotEmpty()
   @IsEmail()

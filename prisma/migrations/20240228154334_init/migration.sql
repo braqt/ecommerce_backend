@@ -4,6 +4,7 @@ CREATE TABLE "Account" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "firebaseAuthID" VARCHAR(60) NOT NULL,
+    "role" VARCHAR(40) NOT NULL,
     "firstName" VARCHAR(40) NOT NULL,
     "lastName" VARCHAR(40) NOT NULL,
     "phone" VARCHAR(20) NOT NULL,

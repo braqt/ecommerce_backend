@@ -107,7 +107,10 @@ export default class AccountRepository {
     return { accounts, count };
   }
 
-  async createAccount(accountDto: AccountDto): Promise<AccountWithId> {
+  async createAccount(
+    firebaseUID: string,
+    accountDto: AccountDto,
+  ): Promise<AccountWithId> {
     const account = await this.prismaService.account.create({
       select: {
         id: true,
@@ -120,6 +123,7 @@ export default class AccountRepository {
       },
       data: {
         ...accountDto,
+        firebaseAuthID: firebaseUID,
       },
     });
 

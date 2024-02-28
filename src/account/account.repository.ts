@@ -20,6 +20,7 @@ export default class AccountRepository {
         documentNumber: true,
         phone: true,
         firebaseAuthID: true,
+        role: true,
         accountStatistics: {
           select: {
             totalSpentInCents: true,
@@ -46,6 +47,7 @@ export default class AccountRepository {
         documentNumber: true,
         phone: true,
         firebaseAuthID: true,
+        role: true,
         accountStatistics: {
           select: {
             totalSpentInCents: true,
@@ -73,6 +75,7 @@ export default class AccountRepository {
         documentNumber: true,
         phone: true,
         firebaseAuthID: true,
+        role: true,
       },
       where: params.name
         ? {
@@ -125,6 +128,7 @@ export default class AccountRepository {
         documentNumber: true,
         phone: true,
         firebaseAuthID: true,
+        role: true,
       },
       data: {
         ...accountParams,

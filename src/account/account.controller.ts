@@ -46,7 +46,10 @@ export default class AccountController {
   @Get('me')
   @UseGuards(FirebaseAuthGuard)
   async me(@GetFirebaseUser() firebaseUser: DecodedIdToken) {
-    const account = await this.accountService.getMyAccount(firebaseUser.uid);
+    const account = await this.accountService.getAccountByFirebaseUID(
+      firebaseUser.uid,
+    );
+    delete account.role;
     delete account.firebaseAuthID;
     delete account.id;
     return account;

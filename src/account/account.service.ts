@@ -31,7 +31,7 @@ export default class AccountService {
     return this.accountRepository.getAccount(getAccountDto.id);
   }
 
-  async getMyAccount(firebaseUID: string): Promise<AccountWithId> {
+  async getAccountByFirebaseUID(firebaseUID: string): Promise<AccountWithId> {
     return this.accountRepository.getAccountByFirebaseAuthID(firebaseUID);
   }
 }

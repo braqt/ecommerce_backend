@@ -5,6 +5,7 @@ export interface Account {
   phone: string;
   documentNumber: string;
   email: string;
+  role: string;
 }
 
 export interface AccountStatistics {

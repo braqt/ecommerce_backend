@@ -1,16 +1,16 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import AccountDto from './dto/account.dto';
-import AccountRepository from './account.repository';
 import AccountStatisticsRepository from './accountStatistics.repository';
 import { GetAccountDto, GetAccountsDto } from './dto/getAccounts.dto';
 import { FirebaseAuthGuard } from '../auth/guard/firebaseAuth.guard';
 import { GetFirebaseUser } from '../auth/decorator/getFirebaseUser.decorator';
 import { DecodedIdToken } from 'firebase-admin/auth';
+import AccountService from './account.service';
 
 @Controller('accounts')
 export default class AccountController {
   constructor(
-    private accountRepository: AccountRepository,
+    private accountService: AccountService,
     private accountStatistics: AccountStatisticsRepository,
   ) {}
 
@@ -20,18 +20,18 @@ export default class AccountController {
     @Body() accountDto: AccountDto,
     @GetFirebaseUser() firebaseUser: DecodedIdToken,
   ) {
-    const account = await this.accountRepository.createAccount(
+    const account = await this.accountService.createAccount(
       firebaseUser.uid,
       accountDto,
     );
     await this.accountStatistics.createAccountStatistics(account.id);
   }
 
-  @Get('getAllAccounts')
+  @Get('getAccounts')
   @UseGuards(FirebaseAuthGuard)
   async getAllAccounts(@Body() getAccountsDto: GetAccountsDto) {
     const { accounts, count } =
-      await this.accountRepository.getAllAccounts(getAccountsDto);
+      await this.accountService.getAccounts(getAccountsDto);
     const pageNumberLimit = Math.ceil(count / getAccountsDto.pageSize);
     return { accounts, pageNumberLimit };
   }
@@ -39,16 +39,14 @@ export default class AccountController {
   @Get('getAccount')
   @UseGuards(FirebaseAuthGuard)
   async getAccount(@Body() getAccountDto: GetAccountDto) {
-    const account = await this.accountRepository.getAccount(getAccountDto);
+    const account = await this.accountService.getAccount(getAccountDto);
     return account;
   }
 
   @Get('me')
   @UseGuards(FirebaseAuthGuard)
   async me(@GetFirebaseUser() firebaseUser: DecodedIdToken) {
-    const account = await this.accountRepository.getAccountByFirebaseAuthID(
-      firebaseUser.uid,
-    );
+    const account = await this.accountService.getMyAccount(firebaseUser.uid);
     delete account.firebaseAuthID;
     delete account.id;
     return account;

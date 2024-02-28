@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import AccountDto from './dto/account.dto';
 import {
   AccountWithAccountStatistics,
   AccountWithId,
 } from './account.interfaces';
-import { GetAccountDto, GetAccountsDto } from './dto/getAccounts.dto';
 import { Prisma } from '@prisma/client';
 import { GetAllAccountsResult } from './account.interfaces';
 
@@ -13,9 +11,7 @@ import { GetAllAccountsResult } from './account.interfaces';
 export default class AccountRepository {
   constructor(private prismaService: PrismaService) {}
 
-  async getAccount(
-    getAccountDto: GetAccountDto,
-  ): Promise<AccountWithAccountStatistics> {
+  async getAccount(id: number): Promise<AccountWithAccountStatistics> {
     const query = {
       select: {
         firstName: true,
@@ -32,7 +28,7 @@ export default class AccountRepository {
           },
         },
       },
-      where: { id: getAccountDto.id },
+      where: { id },
     };
     const account = await this.prismaService.account.findUnique(query);
     return account;
@@ -64,9 +60,11 @@ export default class AccountRepository {
     return account;
   }
 
-  async getAllAccounts(
-    getAccountsDto: GetAccountsDto,
-  ): Promise<GetAllAccountsResult> {
+  async getAccounts(params: {
+    pageNumber: number;
+    pageSize: number;
+    name: string;
+  }): Promise<GetAllAccountsResult> {
     const query: Prisma.AccountFindManyArgs = {
       select: {
         firstName: true,
@@ -76,17 +74,17 @@ export default class AccountRepository {
         phone: true,
         firebaseAuthID: true,
       },
-      where: getAccountsDto.name
+      where: params.name
         ? {
             OR: [
-              { firstName: { contains: getAccountsDto.name } },
-              { lastName: { contains: getAccountsDto.name } },
+              { firstName: { contains: params.name } },
+              { lastName: { contains: params.name } },
             ],
           }
         : {},
       orderBy: { createdAt: 'desc' },
-      skip: getAccountsDto.pageSize * (getAccountsDto.pageNumber - 1),
-      take: getAccountsDto.pageSize,
+      skip: params.pageSize * (params.pageNumber - 1),
+      take: params.pageSize,
     };
     const [accounts, count] = await this.prismaService.$transaction([
       this.prismaService.account.findMany({
@@ -109,7 +107,14 @@ export default class AccountRepository {
 
   async createAccount(
     firebaseUID: string,
-    accountDto: AccountDto,
+    accountParams: {
+      firstName: string;
+      lastName: string;
+      phone: string;
+      documentNumber: string;
+      role: string;
+      email: string;
+    },
   ): Promise<AccountWithId> {
     const account = await this.prismaService.account.create({
       select: {
@@ -122,7 +127,7 @@ export default class AccountRepository {
         firebaseAuthID: true,
       },
       data: {
-        ...accountDto,
+        ...accountParams,
         firebaseAuthID: firebaseUID,
       },
     });

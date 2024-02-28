@@ -1,89 +1,61 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-} from '@nestjs/common';
-import { Request } from 'express';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import OrderService from './order.service';
 import { CreateOrderDto } from './dto/createOrder.dto';
-import {
-  GetAccountOrdersDto,
-  GetOrderDto,
-  GetOrdersDto,
-} from './dto/getOrders.dto';
+import { GetAccountOrdersDto, GetOrdersDto } from './dto/getOrders.dto';
 import { SetOrderStatusDto, SetPaymentStatusDto } from './dto/updateOrder.dto';
+import { FirebaseAuthGuard } from '../auth/guard/firebaseAuth.guard';
+import { GetFirebaseUser } from '../auth/decorator/getFirebaseUser.decorator';
+import { DecodedIdToken } from 'firebase-admin/auth';
 
 @Controller('orders')
 export default class OrderController {
   constructor(private orderService: OrderService) {}
 
   @Post('create')
+  @UseGuards(FirebaseAuthGuard)
   async createOrder(
     @Body() createOrderDto: CreateOrderDto,
-    @Req() req: Request,
+    @GetFirebaseUser() firebaseUser: DecodedIdToken,
   ) {
-    if (!req.headers.authorization) {
-      throw new BadRequestException('authorization header it is not defined');
-    }
-    await this.orderService.createOrder(
-      createOrderDto,
-      req.headers.authorization,
-    );
+    await this.orderService.createOrder(createOrderDto, firebaseUser.uid);
   }
 
   @Get('getOrder')
-  async getOrder(@Body() getOrderDto: GetOrderDto, @Req() req: Request) {
-    if (!req.headers.authorization) {
-      throw new BadRequestException('authorization header it is not defined');
-    }
-    return await this.orderService.getOrder(getOrderDto);
+  @UseGuards(FirebaseAuthGuard)
+  async getOrder(@GetFirebaseUser() firebaseUser: DecodedIdToken) {
+    return await this.orderService.getOrder(firebaseUser.uid);
   }
 
   @Get('getOrders')
-  async getOrders(@Body() getOrdersDto: GetOrdersDto, @Req() req: Request) {
-    if (!req.headers.authorization) {
-      throw new BadRequestException('authorization header it is not defined');
-    }
+  @UseGuards(FirebaseAuthGuard)
+  async getOrders(@Body() getOrdersDto: GetOrdersDto) {
     const { orders, count } = await this.orderService.getOrders(getOrdersDto);
     const pageNumberLimit = Math.ceil(count / getOrdersDto.pageSize);
     return { orders, pageNumberLimit };
   }
 
   @Post('setOrderStatus')
-  async setOrderStatus(
-    @Body() setOrderStatusDto: SetOrderStatusDto,
-    @Req() req: Request,
-  ) {
-    if (!req.headers.authorization) {
-      throw new BadRequestException('authorization header it is not defined');
-    }
+  @UseGuards(FirebaseAuthGuard)
+  async setOrderStatus(@Body() setOrderStatusDto: SetOrderStatusDto) {
     await this.orderService.setOrderStatus(setOrderStatusDto);
   }
 
   @Post('setPaymentStatus')
-  async setPaymentStatus(
-    @Body() setPaymentStatusDto: SetPaymentStatusDto,
-    @Req() req: Request,
-  ) {
-    if (!req.headers.authorization) {
-      throw new BadRequestException('authorization header it is not defined');
-    }
+  @UseGuards(FirebaseAuthGuard)
+  async setPaymentStatus(@Body() setPaymentStatusDto: SetPaymentStatusDto) {
     await this.orderService.setPaymentStatus(setPaymentStatusDto);
   }
 
   @Get('getAccountOrders')
+  @UseGuards(FirebaseAuthGuard)
   async getAccountOrders(
     @Body() getAccountOrdersDto: GetAccountOrdersDto,
-    @Req() req: Request,
+    @GetFirebaseUser() firebaseUser: DecodedIdToken,
   ) {
-    if (!req.headers.authorization) {
-      throw new BadRequestException('authorization header it is not defined');
-    }
-    const { orders, count } =
-      await this.orderService.getAccountOrders(getAccountOrdersDto);
+    const { orders, count } = await this.orderService.getAccountOrders(
+      firebaseUser.uid,
+      getAccountOrdersDto,
+    );
     const pageNumberLimit = Math.ceil(count / getAccountOrdersDto.pageSize);
     return { orders, pageNumberLimit };
   }

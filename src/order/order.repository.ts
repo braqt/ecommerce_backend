@@ -118,8 +118,8 @@ export default class OrderRepository {
     return { orders, count };
   }
 
-  async getOrder(id: number) {
-    return await this.prismaService.order.findUnique({
+  async getOrder(firebaseUID: string) {
+    return await this.prismaService.order.findFirst({
       select: {
         id: true,
         totalInCents: true,
@@ -161,7 +161,7 @@ export default class OrderRepository {
           },
         },
       },
-      where: { id },
+      where: { account: { firebaseAuthID: firebaseUID } },
     });
   }
 
@@ -185,18 +185,18 @@ export default class OrderRepository {
   async getAccountOrders({
     pageNumber,
     pageSize,
-    accountId,
+    firebaseUID,
   }: {
     pageNumber: number;
     pageSize: number;
-    accountId: number;
+    firebaseUID: string;
   }): Promise<GetAccountOrdersResult> {
     const query: Prisma.OrderFindManyArgs = {
       select: {
         id: true,
         totalInCents: true,
       },
-      where: { accountId },
+      where: { account: { firebaseAuthID: firebaseUID } },
       orderBy: { createdAt: 'desc' },
       skip: pageSize * (pageNumber - 1),
       take: pageSize,

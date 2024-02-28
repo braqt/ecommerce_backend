@@ -12,15 +12,7 @@ export class GetOrdersDto {
   orderNumber: number;
 }
 
-export class GetOrderDto {
-  @IsNotEmpty()
-  id: number;
-}
-
 export class GetAccountOrdersDto {
-  @IsNotEmpty()
-  id: number;
-
   @IsNotEmpty()
   pageNumber: number;
 

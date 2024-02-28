@@ -9,11 +9,7 @@ import {
 } from './order.utils';
 import { OrderStatus, PaymentStatus } from './order.enums';
 import AccountRepository from '../account/account.repository';
-import {
-  GetAccountOrdersDto,
-  GetOrderDto,
-  GetOrdersDto,
-} from './dto/getOrders.dto';
+import { GetAccountOrdersDto, GetOrdersDto } from './dto/getOrders.dto';
 import {
   GetAccountOrdersResult,
   GetOrdersResult,
@@ -31,7 +27,7 @@ export default class OrderService {
 
   async createOrder(
     createOrderDto: CreateOrderDto,
-    firebaseAuthID: string,
+    firebaseUID: string,
   ): Promise<void> {
     let totalInCents = 0n;
     let productIds = [];
@@ -50,7 +46,7 @@ export default class OrderService {
     );
     const paymentMethodId = paymentMethodToID(createOrderDto.paymentMethod);
     const account =
-      await this.accountRepository.getAccountByFirebaseAuthID(firebaseAuthID);
+      await this.accountRepository.getAccountByFirebaseAuthID(firebaseUID);
     await this.orderRepository.createOrder({
       totalInCents,
       accountId: account.id,
@@ -64,8 +60,8 @@ export default class OrderService {
     );
   }
 
-  async getOrder({ id }: GetOrderDto): Promise<Order> {
-    return await this.orderRepository.getOrder(id);
+  async getOrder(firebaseUID: string): Promise<Order> {
+    return await this.orderRepository.getOrder(firebaseUID);
   }
 
   async getOrders({
@@ -100,13 +96,12 @@ export default class OrderService {
     );
   }
 
-  async getAccountOrders({
-    id,
-    pageNumber,
-    pageSize,
-  }: GetAccountOrdersDto): Promise<GetAccountOrdersResult> {
+  async getAccountOrders(
+    firebaseUID: string,
+    { pageNumber, pageSize }: GetAccountOrdersDto,
+  ): Promise<GetAccountOrdersResult> {
     return await this.orderRepository.getAccountOrders({
-      accountId: id,
+      firebaseUID,
       pageNumber,
       pageSize,
     });

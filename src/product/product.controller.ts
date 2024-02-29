@@ -5,6 +5,7 @@ import {
   Get,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/createProduct.dto';
@@ -13,6 +14,10 @@ import ImageService from '../image/image.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
 import { GetProductDto, GetProductsDto } from './dto/getProducts.dto';
+import { Roles } from '../auth/decorator/roles.decorator';
+import { Role } from '../auth/auth.enum';
+import { FirebaseAuthGuard } from '../auth/guard/firebaseAuth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
 
 @Controller('products')
 export default class ProductController {
@@ -22,6 +27,8 @@ export default class ProductController {
   ) {}
 
   @Post('create')
+  @Roles([Role.SELLER])
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
   @UseInterceptors(FilesInterceptor('files'))
   async createProduct(
     @Body() body: CreateProductDto,

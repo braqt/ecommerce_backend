@@ -9,7 +9,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/createProduct.dto';
-import ProductRepository from './product.repository';
 import ImageService from '../image/image.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { plainToClass } from 'class-transformer';
@@ -18,11 +17,12 @@ import { Roles } from '../auth/decorator/roles.decorator';
 import { Role } from '../auth/auth.enum';
 import { FirebaseAuthGuard } from '../auth/guard/firebaseAuth.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
+import ProductService from './product.service';
 
 @Controller('products')
 export default class ProductController {
   constructor(
-    private productRepository: ProductRepository,
+    private productService: ProductService,
     private imageService: ImageService,
   ) {}
 
@@ -46,7 +46,7 @@ export default class ProductController {
     const finalPriceInCents =
       priceInCents -
       (priceInCents * BigInt(createProductDto.discountPercentage)) / 100n;
-    await this.productRepository.createProduct({
+    await this.productService.createProduct({
       name: createProductDto.name,
       description: createProductDto.description,
       quantity: createProductDto.quantity,
@@ -57,16 +57,16 @@ export default class ProductController {
     });
   }
 
-  @Get('getAllProducts')
-  async getAllProducts(@Body() getProductsDto: GetProductsDto) {
+  @Get('getProducts')
+  async getProducts(@Body() getProductsDto: GetProductsDto) {
     const { products, count } =
-      await this.productRepository.getProducts(getProductsDto);
+      await this.productService.getProducts(getProductsDto);
     const pageNumberLimit = Math.ceil(count / getProductsDto.pageSize);
     return { products, pageNumberLimit };
   }
 
   @Get('getProduct')
   async getProduct(@Body() getProductDto: GetProductDto) {
-    return await this.productRepository.getProduct(getProductDto);
+    return await this.productService.getProduct(getProductDto);
   }
 }
